@@ -108,7 +108,7 @@ Begin immediately. Report each step as you complete it.`.trim();
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
               model: "claude-sonnet-4-20250514",
-              max_tokens: 8000,
+              max_tokens: 16000,
               system: SYSTEM_PROMPT,
               messages: [{ role: "user", content: userPrompt }],
               mcp_servers: [{ type: "url", url: "https://mcp.clickup.com/mcp", name: "ClickUp" }],
