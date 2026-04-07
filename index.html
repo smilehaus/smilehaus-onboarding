@@ -124,26 +124,46 @@ Begin immediately. Report each step as you complete it.`.trim();
               mcp_servers: [{ type: "url", url: "https://mcp.clickup.com/mcp", name: "ClickUp" }],
             }),
           });
-          const data = await resp.json();
-          if (!resp.ok) throw new Error(data.error?.message || `API error ${resp.status}`);
-
-          for (const block of data.content || []) {
-            if (block.type === "text") {
-              block.text.split("\n").filter(l => l.trim()).forEach(line => {
-                const type = line.startsWith("✅") ? "success"
-                           : line.startsWith("❌") ? "error"
-                           : line.startsWith("⚠️") ? "warn"
-                           : "info";
-                addLog(line, type);
-              });
-            } else if (block.type === "mcp_tool_use") {
-              addLog(`⚙️  ${block.name}...`, "tool");
+          if (!resp.ok) {
+            const et = await resp.text();
+            try { const e = JSON.parse(et); throw new Error(e.error?.message || `API error ${resp.status}`); }
+            catch(pe) { if (pe.message.includes("API error")) throw pe; throw new Error(`API error ${resp.status}`); }
+          }
+          const reader = resp.body.getReader();
+          const decoder = new TextDecoder();
+          let buf = "", curText = "";
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            buf += decoder.decode(value, { stream: true });
+            const lines = buf.split("
+");
+            buf = lines.pop() || "";
+            for (const ln of lines) {
+              if (!ln.startsWith("data: ")) continue;
+              const d = ln.slice(6).trim();
+              if (d === "[DONE]") continue;
+              try {
+                const evt = JSON.parse(d);
+                if (evt.type === "content_block_start" && evt.content_block?.type === "mcp_tool_use") addLog("⚙️  " + evt.content_block.name + "...", "tool");
+                if (evt.type === "content_block_start" && evt.content_block?.type === "text") curText = "";
+                if (evt.type === "content_block_delta" && evt.delta?.type === "text_delta") curText += evt.delta.text;
+                if (evt.type === "content_block_stop" && curText) {
+                  curText.split("
+").filter(l => l.trim()).forEach(ln2 => {
+                    const type = ln2.startsWith("✅") ? "success" : ln2.startsWith("❌") ? "error" : ln2.startsWith("⚠️") ? "warn" : "info";
+                    addLog(ln2, type);
+                  });
+                  curText = "";
+                }
+                if (evt.type === "error") throw new Error(evt.error?.message || "Stream error");
+              } catch(pe) { if (pe.message === "Stream error" || pe.message.includes("API error")) throw pe; }
             }
           }
           setPhase("done");
           addLog("", "divider");
-          addLog(`🦷 Onboarding complete for ${form.name}`, "success");
-        } catch (err) {
+          addLog("🦷 Onboarding complete for " + form.name, "success");
+          } catch (err) {
           addLog(`❌ ${err.message}`, "error");
           setPhase("error");
         }

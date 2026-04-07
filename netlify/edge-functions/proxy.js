@@ -16,6 +16,7 @@ export default async (request) => {
   try {
     const body = await request.json();
 
+    // Inject ClickUp auth token
     if (body.mcp_servers) {
       body.mcp_servers = body.mcp_servers.map((s) =>
         s.name === "ClickUp"
@@ -23,6 +24,9 @@ export default async (request) => {
           : s
       );
     }
+
+    // Force streaming to prevent edge function timeout
+    body.stream = true;
 
     const upstream = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
@@ -35,11 +39,13 @@ export default async (request) => {
       body: JSON.stringify(body),
     });
 
-    // Pipe Anthropic's response body directly — keeps connection alive
+    // Stream the SSE response through — keeps connection alive
     return new Response(upstream.body, {
       status: upstream.status,
       headers: {
-        "Content-Type": "application/json",
+        "Content-Type": "text/event-stream",
+        "Cache-Control": "no-cache",
+        "Connection": "keep-alive",
         "Access-Control-Allow-Origin": "*",
       },
     });
@@ -54,5 +60,4 @@ export default async (request) => {
   }
 };
 
-// Declare path in the function itself as well as netlify.toml
 export const config = { path: "/api/proxy" };
