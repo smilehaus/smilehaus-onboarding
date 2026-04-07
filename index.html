@@ -121,7 +121,7 @@ Begin immediately. Report each step as you complete it.`.trim();
               max_tokens: 8000,
               system: SYSTEM_PROMPT,
               messages: [{ role: "user", content: userPrompt }],
-              mcp_servers: [{ type: "url", url: "https://mcp.clickup.com/mcp", name: "ClickUp", custom_headers: { "x-workspace-id": "9014079163" } }],
+              mcp_servers: [{ type: "url", url: "https://mcp.clickup.com/mcp", name: "ClickUp" }],
             }),
           });
           const data = await resp.json();
