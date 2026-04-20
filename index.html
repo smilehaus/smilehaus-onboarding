@@ -218,7 +218,9 @@ CRITICAL: Do NOT read template tasks. All task names are listed above. Create th
         setLog([]);
         addLog(`Starting onboarding for ${form.name}...`, "start");
 
-        const subId = existingId || `sub_${Date.now()}_${Math.random().toString(36).slice(2,8)}`;
+        // onClick passes the event object — only accept existingId if it's a string
+        const safeExistingId = typeof existingId === "string" ? existingId : null;
+        const subId = safeExistingId || `sub_${Date.now()}_${Math.random().toString(36).slice(2,8)}`;
         setLastSubId(subId);
 
         const payload = {
