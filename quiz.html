@@ -1,10 +1,13 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/><title>Training Quiz - Smile Haus</title>
 <link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
-<style>*{box-sizing:border-box;margin:0;padding:0}body{background:#F2EFE8;font-family:Jost,sans-serif;color:#000}.wrap{max-width:700px;margin:0 auto;padding:24px 16px 60px}.hdr{background:#000;padding:28px 32px;text-align:center;border-radius:2px 2px 0 0}.hdr h2{color:#D6CDBD;font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase}.hdr h3{color:#877765;font-size:9px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;margin-top:4px}.card{background:#fff;border:1px solid #D6CDBD;border-radius:2px;overflow:hidden;margin-bottom:20px}.bd{padding:24px 28px}.fld{margin-bottom:16px}.fld label{display:block;font-size:11px;color:#877765;font-weight:600;letter-spacing:.06em;text-transform:uppercase;margin-bottom:5px}.fld input[type=text]{width:100%;padding:10px 12px;border:1px solid #D6CDBD;border-radius:2px;font-size:14px;font-family:inherit}.st{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#877765;margin:28px 0 16px;padding-bottom:8px;border-bottom:1px solid #D6CDBD}.q{margin-bottom:20px}.qt{font-size:14px;font-weight:600;margin-bottom:8px}.qt .n{color:#877765}.opts label{display:block;padding:7px 12px;margin:3px 0;border-radius:2px;font-size:13px;cursor:pointer}.opts label:hover{background:#F2EFE8}.opts input{margin-right:8px;accent-color:#877765}.btn{width:100%;padding:14px 20px;background:#000;color:#F2EFE8;border:none;border-radius:2px;font-size:14px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;font-family:inherit}.btn:hover{background:#877765}.rb{padding:24px;border-radius:2px;text-align:center;margin:20px 0}.rb.p{background:#e8f5e9;border:2px solid #2e7d32}.rb.f{background:#fdecea;border:2px solid #c62828}.rb .s{font-size:48px;font-weight:700}.rb .l{font-size:14px;color:#555;margin-top:4px}.rb .v{font-size:18px;font-weight:700;margin-top:12px}.rb.p .v{color:#2e7d32}.rb.f .v{color:#c62828}.ri{padding:10px 14px;margin:4px 0;border-radius:2px;font-size:13px;display:flex;gap:8px}.ri.c{background:#e8f5e9}.ri.w{background:#fdecea}.sm{text-align:center;font-size:13px;color:#877765;margin-top:12px}.hd{display:none}.ft{text-align:center;font-size:11px;color:#877765;margin-top:20px}.err{background:#fdecea;color:#c62828;padding:16px;border-radius:2px;text-align:center;font-size:14px}</style></head><body>
+<style>*{box-sizing:border-box;margin:0;padding:0}body{background:#F2EFE8;font-family:Jost,sans-serif;color:#000}.wrap{max-width:700px;margin:0 auto;padding:24px 16px 60px}.hdr{background:#000;padding:28px 32px;text-align:center;border-radius:2px 2px 0 0}.hdr h2{color:#D6CDBD;font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase}.hdr h3{color:#877765;font-size:9px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;margin-top:4px}.card{background:#fff;border:1px solid #D6CDBD;border-radius:2px;overflow:hidden;margin-bottom:20px}.bd{padding:24px 28px}.fld{margin-bottom:16px}.fld label{display:block;font-size:11px;color:#877765;font-weight:600;letter-spacing:.06em;text-transform:uppercase;margin-bottom:5px}.fld input[type=text],.fld select{width:100%;padding:10px 12px;border:1px solid #D6CDBD;border-radius:2px;font-size:14px;font-family:inherit}.fld input[readonly]{background:#F2EFE8;color:#877765;cursor:not-allowed}.banner{background:#e8f5e9;color:#2e7d32;padding:10px 14px;font-size:12px;border-radius:2px;margin-bottom:16px;border:1px solid #2e7d32}.banner.warn{background:#fff8e1;color:#b26a00;border-color:#f0c040}.st{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#877765;margin:28px 0 16px;padding-bottom:8px;border-bottom:1px solid #D6CDBD}.q{margin-bottom:20px}.qt{font-size:14px;font-weight:600;margin-bottom:8px}.qt .n{color:#877765}.opts label{display:block;padding:7px 12px;margin:3px 0;border-radius:2px;font-size:13px;cursor:pointer}.opts label:hover{background:#F2EFE8}.opts input{margin-right:8px;accent-color:#877765}.btn{width:100%;padding:14px 20px;background:#000;color:#F2EFE8;border:none;border-radius:2px;font-size:14px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;font-family:inherit}.btn:hover{background:#877765}.rb{padding:24px;border-radius:2px;text-align:center;margin:20px 0}.rb.p{background:#e8f5e9;border:2px solid #2e7d32}.rb.f{background:#fdecea;border:2px solid #c62828}.rb .s{font-size:48px;font-weight:700}.rb .l{font-size:14px;color:#555;margin-top:4px}.rb .v{font-size:18px;font-weight:700;margin-top:12px}.rb.p .v{color:#2e7d32}.rb.f .v{color:#c62828}.ri{padding:10px 14px;margin:4px 0;border-radius:2px;font-size:13px;display:flex;gap:8px}.ri.c{background:#e8f5e9}.ri.w{background:#fdecea}.sm{text-align:center;font-size:13px;color:#877765;margin-top:12px}.hd{display:none}.ft{text-align:center;font-size:11px;color:#877765;margin-top:20px}.err{background:#fdecea;color:#c62828;padding:16px;border-radius:2px;text-align:center;font-size:14px}</style></head><body>
 <div class="wrap"><div class="card"><div class="hdr"><h2 id="quiz-title">Loading Quiz...</h2><h3 id="quiz-sub"></h3></div><div class="bd">
 <div id="err-no-quiz" class="err hd">Invalid quiz. Please use the link from your ClickUp task.</div>
+<div id="attrib-banner" class="banner hd"></div>
 <div id="fs" class="hd">
 <div class="fld"><label>Employee Name *</label><input type="text" id="en" placeholder="Samantha Venti"/></div>
+<div class="fld hd" id="pick-fld"><label>or Select from Recent Onboardings</label><select id="pick"><option value="">— Select a trainee —</option></select></div>
+<div class="fld"><label>Home Office *</label><select id="off"><option value="">Select office</option><option value="SQ">SQ</option><option value="GT">GT</option><option value="ATX">ATX</option><option value="MP">MP</option><option value="NBDA">NBDA</option><option value="IC">IC</option><option value="AR">AR</option><option value="PF">PF</option><option value="SATX">SATX</option><option value="AM">AM</option></select></div>
 <div class="fld"><label>Graded By (Trainer/OM) *</label><input type="text" id="gn" placeholder="Office Manager Name"/></div>
 <div id="questions"></div>
 <hr style="border:none;height:1px;background:#D6CDBD;margin:24px 0"/>
@@ -16,16 +19,69 @@
 <script>
 var QUIZZES={"1":{"title":"Week 1 Knowledge Quiz","subtitle":"Foundation & Front Desk Basics","passScore":80,"sections":[{"name":"Culture and Organization","questions":[[1,"Who are the three co-founders of Smile Haus?","Dr. Levo, Dr. Smith, and Anh","Dr. Levo, Dr. Farn, and Anh","Dr. Farn, Dr. Smith, and Lacy","Dr. Levo, Dr. Farn, and Lacy","b"],[2,"What is the Smile Haus philosophy called?","Patient-Centered Care","Modern Family Dentistry","Boutique Dental Experience","Premium Patient Care","b"],[3,"Why does NBDA have a different name?","Franchise","Name was well known when SH bought the practice","Different company","Branding mistake","b"]]},{"name":"HIPAA and Compliance","questions":[[4,"When can a new team member interact with patients?","After first day","After Oryx Academy","After HIPAA form signed and filed","After OM approves","c"],[5,"Which is PHI?","Office address","Patient appointment date and treatment plan","Office phone number","Doctor schedule","b"],[6,"Family calls about patient treatment?","Give info since family","Call back business hours","Cannot share without patient authorization","Transfer to doctor","c"]]},{"name":"KPIs and Metrics","questions":[[7,"Target Hygiene Re-Appointment Rate?","80%","85%","90%","95%","c"],[8,"Target Cancellation Rate?","Less than 10%","Less than 5%","Less than 3%","Zero","b"],[9,"Target Case Acceptance?","20%+","30%+","40%+","50%+","c"]]},{"name":"Phone Verbiage","questions":[[10,"Correct approach answering phone?","Personal greeting","Office greeting script naturally","Just say office name","Voicemail if busy","b"],[11,"Placing patient on hold?","Press hold","Ask permission first","Call back in 5 min","Transfer","b"],[12,"Patient upset about balance. First step?","Transfer to billing","Explain charges","Acknowledge, empathize, act","Doctor will call back","c"],[13,"Firm commitment: NOT say?","Dr. reserved time for procedure","Anything to help make that work?","Any way to keep this? 50 dollar fee.","We value the time set aside","c"]]},{"name":"Check-In and Routing","questions":[[14,"Greet patient by name within?","1 minute","5 minutes","30 seconds","When provider ready","c"],[15,"Verify at every check-in?","Name and time","Address, phone, insurance, emergency, medical hx yearly","Insurance card only","Email","b"],[16,"What is the 3-Way Match?","Patient-provider-room","Routing sheet, Oryx ledger, clinical notes","Name, DOB, insurance","AM/PM/evening","b"],[17,"Routing sheet discrepancy?","Post fix tomorrow","Flag immediately, never post and hope","Ask patient","Ignore if small","b"]]},{"name":"Scheduling and Flow","questions":[[18,"New patient: collect?","Name and date","Insurance + bring ID, card, paperwork","Phone only","SSN","b"],[19,"Provider 15 min behind?","Wait for patients to ask","Proactively communicate wait time","Emergency excuse","Reschedule","b"],[20,"Chair opens early, same-day TX?","Leave empty","Notify TC for conversion attempt","Waitlist only","Ask doctor","b"]]}]},"3":{"title":"Week 3 Knowledge Quiz","subtitle":"Treatment Planning & Checkout","passScore":80,"sections":[{"name":"Insurance Verification","questions":[[1,"What are the two types of insurance verifications?","Phone and fax","Full Breakdown and Eligibility Check","New patient and existing patient","Manual and automated","b"],[2,"How often is a Full Breakdown IV done for hygiene patients?","Every visit","Every 6 months","Once per year","Only for new patients","c"],[3,"What is an Eligibility Check used for?","New patient registration","Existing patients with treatment scheduled, before every appointment","Annual benefits review","Insurance claims processing","b"]]},{"name":"Treatment Planning Cycle","questions":[[4,"In the TX plan cycle, who picks up after the doctor finishes the exam?","Office Manager","Dental Assistant","Treatment Coordinator","Hygienist","c"],[5,"What must happen before a patient leaves after treatment planning?","They sign a consent form","They are scheduled for their next appointment with a financial agreement documented","They pay in full","They speak with the OM","b"],[6,"After the doctor finishes the exam, what is the TC's FIRST responsibility?","Schedule the next appointment","Collect payment","Prepare the financial breakdown","Call the insurance company","c"]]},{"name":"TX Planning: Insurance Scenarios","questions":[[7,"Which insurance details must the TC apply when building the TX plan?","Only the coverage percentage","Coverage %, annual max, and deductible used/remaining","Just the deductible","Only the annual max","b"],[8,"For patients WITHOUT insurance, who must approve any discounting?","Treatment Coordinator","Doctor","Office Manager","Patient","c"],[9,"What financing options can be offered to uninsured patients?","CareCredit, Cherry, HFD, in-house payment plans","Cash discount only","No financing available","Insurance application assistance","a"]]},{"name":"Checkout and Scrambling Eggs","questions":[[10,"What is the FIRST thing to do when you see a patient walking out of clinical?","Greet them warmly","Pull up their account in Oryx with routing sheet in hand","Ask if they need to schedule","Process their payment","b"],[11,"What does Scrambling Eggs verify? (select best answer)","Patient satisfaction","All procedures posted correctly with correct ADA codes, provider, and insurance billing","Appointment confirmations for tomorrow","End-of-day cash count","b"],[12,"When scheduling the next appointment at checkout, what should you NOT say?","Let me get you scheduled","I have the 14th at 9 AM or the 15th at 2 PM","Would you like to schedule your next appointment?","Dr. Name wants to see you back in 6 months","c"],[13,"What is the 3-Way Match at end of day?","Routing sheet, Oryx ledger, and clinical notes all match","Patient count, payment count, and schedule count","Morning report, mid-day report, and closing report","Doctor notes, DA notes, and front desk notes","a"]]},{"name":"Invisalign and Implants","questions":[[14,"How many Invisalign pricing scenarios must front desk master?","1 (standard fee)","2 (insurance and no insurance)","3 (with insurance, without insurance, with In-Haus Membership)","4 (adult, teen, express, comprehensive)","c"],[15,"What is the first step when an implant case is outside in-house scope?","Tell the patient it cannot be done","Refer to the appropriate specialist per referral workflow","Have the patient find their own specialist","Schedule anyway and figure it out later","b"]]},{"name":"Treatment Plan Presentation","questions":[[16,"For same-day treatment, the correct verbiage is:","Do you want to do the filling today?","Since you are already here and numbed up, Dr. Name can take care of that right now","We can try to fit it in if you want","The doctor says you need this done","b"],[17,"For collecting a balance, the correct approach is:","You have a balance of...","Your insurance did not cover...","Let us go ahead and get your account current, your balance today is...","We need payment before your next visit","c"]]},{"name":"Conflict Resolution","questions":[[18,"Patient upset about their bill. What is the first step?","Explain why the charge is correct","Acknowledge, empathize, then act using approved de-escalation verbiage","Transfer to billing department","Offer a discount","b"],[19,"A patient becomes verbally abusive at the front desk. When should you ask them to leave?","Never, always de-escalate","When they use profanity","When de-escalation fails and behavior is threatening, per protocol","Only if the doctor says so","c"],[20,"After any conflict incident with a patient, what is mandatory?","Calling the patient to apologize","Post-incident documentation in Oryx/ClickUp","Offering the patient a credit","Reporting to corporate","b"]]}]}};
 var WEBHOOK="https://hook.us2.make.com/3apmiiiqun35ragyrjxj81ipfs8dhwbc";
+var HISTORY_KEY="sh_onboarding_history_v1";
 var ps=new URLSearchParams(window.location.search);
 var weekNum=ps.get("week");
 var taskId=ps.get("taskId")||"";
+var urlName=ps.get("name")||"";
+var urlOffice=ps.get("office")||"";
+var urlSubId=ps.get("sub")||""; // submission ID from history
 var quiz=QUIZZES[weekNum];
 var answers={},topics={};
+
+// Load history from localStorage (same-browser onboardings)
+function loadHistory(){try{return JSON.parse(localStorage.getItem(HISTORY_KEY)||"[]")}catch(e){return[]}}
+
 if(!quiz){document.getElementById("err-no-quiz").classList.remove("hd");}else{
 document.title="Week "+weekNum+" Quiz - Smile Haus";
 document.getElementById("quiz-title").textContent=quiz.title;
 document.getElementById("quiz-sub").textContent=quiz.subtitle;
 document.getElementById("fs").classList.remove("hd");
+
+// Attribution banner + field locking
+var banner=document.getElementById("attrib-banner");
+var enInput=document.getElementById("en");
+var offSel=document.getElementById("off");
+if(taskId){
+  // Came from ClickUp task — full attribution guaranteed
+  banner.textContent="\u2713 Attribution verified from ClickUp task link. This quiz will be posted to the correct trainee.";
+  banner.classList.remove("hd");
+  if(urlName){enInput.value=urlName;enInput.setAttribute("readonly","readonly")}
+  if(urlOffice){offSel.value=urlOffice;offSel.setAttribute("disabled","disabled")}
+} else {
+  // No taskId — offer history-based picker if available
+  var hist=loadHistory();
+  var activeHist=hist.filter(function(e){return e.status==="sent" && e.name});
+  if(activeHist.length>0){
+    banner.innerHTML="\u26a0 No task ID in link. Select from recent onboardings below, or enter manually. <b>Best practice:</b> always open the quiz from the ClickUp task.";
+    banner.className="banner warn";
+    banner.classList.remove("hd");
+    var pickFld=document.getElementById("pick-fld");
+    var pickSel=document.getElementById("pick");
+    pickFld.classList.remove("hd");
+    activeHist.forEach(function(e){
+      var opt=document.createElement("option");
+      opt.value=e.id;
+      opt.textContent=e.name+" — "+e.office+" ("+new Date(e.submittedAt).toLocaleDateString()+")";
+      opt.setAttribute("data-name",e.name);
+      opt.setAttribute("data-office",e.office);
+      pickSel.appendChild(opt);
+    });
+    pickSel.addEventListener("change",function(){
+      var o=pickSel.selectedOptions[0];
+      if(o && o.value){
+        enInput.value=o.getAttribute("data-name")||"";
+        offSel.value=o.getAttribute("data-office")||"";
+        urlSubId=o.value;
+      }
+    });
+  } else {
+    banner.innerHTML="\u26a0 No task ID in this link. The quiz will still be graded, but ClickUp attribution requires manual matching. <b>Best practice:</b> open the quiz from the trainee\u2019s ClickUp task.";
+    banner.className="banner warn";
+    banner.classList.remove("hd");
+  }
+}
+
 var qEl=document.getElementById("questions");var qNum=0;
 quiz.sections.forEach(function(sec){
 var h=document.createElement("div");h.className="st";h.textContent=sec.name;qEl.appendChild(h);
@@ -36,9 +92,12 @@ var abcs="abcd";for(var i=0;i<4;i++){html+="<label><input type=\"radio\" name=\"
 html+="</div>";d.innerHTML=html;qEl.appendChild(d);
 answers["q"+qNum]=q[6];topics["q"+qNum]=sec.name;
 });});}
+
 function grade(){
-var n=document.getElementById("en").value.trim(),g=document.getElementById("gn").value.trim();
-if(!n||!g){document.getElementById("em").textContent="Fill in both names.";document.getElementById("em").classList.remove("hd");return}
+var n=document.getElementById("en").value.trim();
+var g=document.getElementById("gn").value.trim();
+var off=document.getElementById("off").value;
+if(!n||!g||!off){document.getElementById("em").textContent="Fill in employee name, office, and grader.";document.getElementById("em").classList.remove("hd");return}
 var total=Object.keys(answers).length,c=0,m=[];
 for(var i=1;i<=total;i++){var k="q"+i,s=document.querySelector("input[name="+k+"]:checked"),a=s?s.value:"";if(a===answers[k])c++;else m.push("Q"+i+" ("+topics[k]+")")}
 var p=Math.round(c/total*100),ok=p>=quiz.passScore;
@@ -49,12 +108,50 @@ document.getElementById("tot").textContent="out of "+total;
 document.getElementById("pc").textContent=p+"%";
 var nextWeek=parseInt(weekNum)+1;
 document.getElementById("vd").textContent=ok?"PASS - Proceed to Week "+nextWeek:"DID NOT PASS - Review and Retest Today";
-document.getElementById("ri").textContent="Employee: "+n+" | Graded by: "+g+" | "+new Date().toLocaleDateString();
+document.getElementById("ri").textContent="Employee: "+n+" | Office: "+off+" | Graded by: "+g+" | "+new Date().toLocaleDateString();
 var rl=document.getElementById("rl");
 for(var j=1;j<=total;j++){var k2="q"+j,s2=document.querySelector("input[name="+k2+"]:checked"),a2=s2?s2.value:"",ok2=a2===answers[k2],d=document.createElement("div");d.className="ri "+(ok2?"c":"w");d.innerHTML="<span>"+(ok2?"\u2705":"\u274c")+"</span><span>Q"+j+" ("+topics[k2]+")"+(ok2?"":(" - Correct: "+answers[k2].toUpperCase()))+"</span>";rl.appendChild(d)}
-var pl={type:"quiz_week"+weekNum,week:weekNum,employeeName:n,graderName:g,score:c,total:total,percentage:p,pass:ok,missed:m.join(", ")||"None",taskId:taskId,date:new Date().toISOString()};
+
+// Rich payload — multiple identity fields so Make.com can route correctly
+// priority order: taskId > submissionId > (employeeName + office)
+var pl={
+  type:"quiz_week"+weekNum,
+  week:weekNum,
+  employeeName:n,
+  office:off,
+  graderName:g,
+  score:c,
+  total:total,
+  percentage:p,
+  pass:ok,
+  missed:m.join(", ")||"None",
+  taskId:taskId,
+  submissionId:urlSubId,
+  attribSource: taskId?"url_taskid":(urlSubId?"history_pick":"manual"),
+  date:new Date().toISOString()
+};
 var st=document.getElementById("sx");
 st.textContent="Posting results to ClickUp...";
-fetch(WEBHOOK,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(pl)}).then(function(r){st.textContent=r.ok?"\u2705 Results posted to ClickUp task.":"\u26a0 Could not post. Screenshot this page."}).catch(function(){st.textContent="\u26a0 Could not post. Screenshot this page."});
+
+// Also persist the quiz result locally for a quiz-history view (future use)
+try{
+  var QHIST="sh_quiz_results_v1";
+  var qhist=JSON.parse(localStorage.getItem(QHIST)||"[]");
+  qhist.unshift({at:new Date().toISOString(),...pl});
+  localStorage.setItem(QHIST,JSON.stringify(qhist.slice(0,50)));
+}catch(e){}
+
+fetch(WEBHOOK,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(pl)})
+  .then(function(r){return r.text().then(function(t){return {ok:r.ok,status:r.status,body:t}})})
+  .then(function(res){
+    if(res.ok){
+      st.innerHTML="\u2705 Results posted to ClickUp "+(taskId?"(task "+taskId.slice(-8)+")":"")+"<br/><span style='font-size:11px'>If the comment doesn\u2019t appear on the correct task within 1 min, take a screenshot and send to OM.</span>";
+    } else {
+      st.innerHTML="\u26a0 Webhook returned "+res.status+".<br/><span style='font-size:11px'>Screenshot this page and send to OM. Response: "+(res.body||"").slice(0,200)+"</span>";
+    }
+  })
+  .catch(function(err){
+    st.innerHTML="\u26a0 Network error: "+err.message+"<br/><span style='font-size:11px'>Screenshot this page and send to OM.</span>";
+  });
 }
 </script></body></html>

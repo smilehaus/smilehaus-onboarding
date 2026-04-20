@@ -161,10 +161,32 @@ Day15: "Day 15 — Office Manager Go-Live Clearance & Sign-Off" (1)
 
 CRITICAL: Do NOT read template tasks. All task names are listed above. Create them directly. Be extremely efficient — minimize output text, maximize tool calls. This is for Patient Coordinator role ONLY. For other roles, read tasks from their template folder instead.`;
 
+    // ===== History persistence (localStorage) =====
+    const HISTORY_KEY = "sh_onboarding_history_v1";
+    const loadHistory = () => {
+      try { return JSON.parse(localStorage.getItem(HISTORY_KEY) || "[]"); }
+      catch { return []; }
+    };
+    const saveHistory = (arr) => {
+      try { localStorage.setItem(HISTORY_KEY, JSON.stringify(arr.slice(0, 100))); }
+      catch {}
+    };
+    const upsertHistory = (entry) => {
+      const list = loadHistory();
+      const idx = list.findIndex(e => e.id === entry.id);
+      if (idx >= 0) list[idx] = { ...list[idx], ...entry };
+      else list.unshift(entry);
+      saveHistory(list);
+      return list;
+    };
+
     function App() {
+      const [tab, setTab] = useState("onboard"); // onboard | history
       const [form, setForm] = useState({ name: "", office: "", role: "", start: "", traineeEmail: "", trainerEmail: "", schedule: { Mon:"", Tue:"", Wed:"", Thu:"", Fri:"", Sat:"", Sun:"" } });
       const [phase, setPhase] = useState("idle");
       const [log, setLog] = useState([]);
+      const [history, setHistory] = useState(loadHistory());
+      const [lastSubId, setLastSubId] = useState(null);
       const logRef = useRef(null);
 
       const set = (k, v) => {
@@ -191,47 +213,124 @@ CRITICAL: Do NOT read template tasks. All task names are listed above. Create th
       const workDays = Object.values(form.schedule).filter(v => v !== "");
       const canRun = form.name && form.office && form.role && form.start && workDays.length > 0;
 
-      async function runOnboarding() {
+      async function runOnboarding(existingId) {
         setPhase("running");
         setLog([]);
         addLog(`Starting onboarding for ${form.name}...`, "start");
 
-        const userPrompt = `Execute the full onboarding workflow for:
-- Employee Name: ${form.name}
-- Office: ${form.office}
-- Role: ${form.role}
-- Start Date: ${form.start}
-${form.traineeEmail ? `- Trainee Email: ${form.traineeEmail}` : "- No trainee email — leave tasks unassigned"}
-${form.trainerEmail ? `- Trainer Email: ${form.trainerEmail}` : ""}
-Begin immediately. Report each step as you complete it.`.trim();
+        const subId = existingId || `sub_${Date.now()}_${Math.random().toString(36).slice(2,8)}`;
+        setLastSubId(subId);
+
+        const payload = {
+          submissionId: subId,
+          name: form.name,
+          office: form.office,
+          role: form.role,
+          start: form.start,
+          traineeEmail: form.traineeEmail,
+          trainerEmail: form.trainerEmail,
+          homeOfficeId: OFFICE_TO_CLICKUP_ID[form.office] || "",
+          tasks: TASKS_PC.map(t => ({...t, due: calcDueDates(form.start, form.schedule)[t.d] || null})),
+        };
+
+        // Record attempt in history BEFORE fetch
+        const baseEntry = {
+          id: subId,
+          name: form.name,
+          office: form.office,
+          role: form.role,
+          start: form.start,
+          traineeEmail: form.traineeEmail,
+          trainerEmail: form.trainerEmail,
+          submittedAt: new Date().toISOString(),
+          status: "sending",
+          attempts: (loadHistory().find(e=>e.id===subId)?.attempts || 0) + 1,
+          responseStatus: null,
+          responseBody: null,
+          error: null,
+          payload,
+        };
+        setHistory(upsertHistory(baseEntry));
+        addLog(`📋 Logged to history (ID: ${subId})`, "info");
 
         try {
           const resp = await fetch("https://hook.us2.make.com/eupqr1ujk4onc2wyhvrz4ykng411k9f8", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              name: form.name,
-              office: form.office,
-              role: form.role,
-              start: form.start,
-              traineeEmail: form.traineeEmail,
-              trainerEmail: form.trainerEmail,
-              homeOfficeId: OFFICE_TO_CLICKUP_ID[form.office] || "",
-              tasks: TASKS_PC.map(t => ({...t, due: calcDueDates(form.start, form.schedule)[t.d] || null})),
-            }),
+            body: JSON.stringify(payload),
           });
-          if (!resp.ok) throw new Error("Make.com webhook error: " + resp.status);
-          addLog("✅ Onboarding request sent to automation", "success");
-          addLog("⚙️ Creating folder, lists, and 44 tasks in ClickUp...", "tool");
-          addLog("This runs in the background via Make.com (no AI needed)", "info");
-          addLog("Check ClickUp in ~30 seconds for the completed folder", "info");
+          const bodyText = await resp.text().catch(()=>"");
+          const finalStatus = resp.ok ? "sent" : "failed";
+          setHistory(upsertHistory({
+            id: subId,
+            status: finalStatus,
+            responseStatus: resp.status,
+            responseBody: bodyText.slice(0, 1000),
+            completedAt: new Date().toISOString(),
+            error: resp.ok ? null : `HTTP ${resp.status}: ${bodyText.slice(0,200)}`,
+          }));
+
+          if (!resp.ok) throw new Error(`Webhook returned ${resp.status}: ${bodyText.slice(0, 200)}`);
+
+          addLog("✅ Onboarding request sent to Make.com", "success");
+          addLog(`   Response: ${bodyText.slice(0,80) || "(empty)"}`, "info");
+          addLog("⚙️ Make.com scenario is now creating folder + 49 tasks...", "tool");
+          addLog("   Check ClickUp in ~30–60 seconds for the folder", "info");
           addLog("", "divider");
-          addLog("🦷 Onboarding automation triggered for " + form.name, "success");
+          addLog(`⚠️ NOTE: Make.com has a known filter bug between modules 8→9`, "warn");
+          addLog(`   If quiz tasks don't get quiz URLs, that filter is missing.`, "warn");
+          addLog(`   Add filter in Make.com UI: condition "1.tasks[].quiz" is not empty`, "warn");
+          addLog("", "divider");
+          addLog(`🦷 Onboarding triggered for ${form.name} — see History tab for status`, "success");
           setPhase("done");
         } catch (err) {
+          setHistory(upsertHistory({
+            id: subId,
+            status: "failed",
+            error: err.message,
+            completedAt: new Date().toISOString(),
+          }));
           addLog(`❌ ${err.message}`, "error");
+          addLog(`   Submission ID: ${subId} — you can retry from the History tab.`, "warn");
           setPhase("error");
         }
+      }
+
+      function retryFromHistory(entry) {
+        setForm({
+          name: entry.name || "",
+          office: entry.office || "",
+          role: entry.role || "",
+          start: entry.start || "",
+          traineeEmail: entry.traineeEmail || "",
+          trainerEmail: entry.trainerEmail || "",
+          schedule: entry.payload?.tasks ? inferScheduleFromTasks(entry.payload.tasks) : { Mon:"", Tue:"", Wed:"", Thu:"", Fri:"", Sat:"", Sun:"" },
+        });
+        setTab("onboard");
+        setPhase("idle");
+      }
+
+      function inferScheduleFromTasks(tasks) {
+        // Best-effort: default to entry's office if present via form prefill
+        return { Mon:"", Tue:"", Wed:"", Thu:"", Fri:"", Sat:"", Sun:"" };
+      }
+
+      function deleteHistoryEntry(id) {
+        const list = loadHistory().filter(e => e.id !== id);
+        saveHistory(list);
+        setHistory(list);
+      }
+
+      function clearAllHistory() {
+        if (!confirm("Delete ALL history? This cannot be undone.")) return;
+        saveHistory([]);
+        setHistory([]);
+      }
+
+      function copyPayload(entry) {
+        navigator.clipboard.writeText(JSON.stringify(entry.payload, null, 2))
+          .then(()=>alert("Payload copied to clipboard"))
+          .catch(()=>alert("Copy failed — open browser console to inspect"));
       }
 
       function reset() {
@@ -274,7 +373,55 @@ Begin immediately. Report each step as you complete it.`.trim();
               <div style={s.headerSub}>New Member Onboarding</div>
             </div>
 
-            <div style={s.body}>
+            <div style={{display:"flex",borderBottom:`1px solid ${SH.sand}`,background:"#fff"}}>
+              <button onClick={()=>setTab("onboard")} style={{flex:1,padding:"14px 0",background:"transparent",border:"none",borderBottom:tab==="onboard"?`2px solid ${SH.charcoal}`:"2px solid transparent",fontSize:11,fontWeight:700,letterSpacing:"0.12em",textTransform:"uppercase",color:tab==="onboard"?SH.charcoal:SH.taupe,cursor:"pointer",fontFamily:"inherit"}}>New Trainee</button>
+              <button onClick={()=>setTab("history")} style={{flex:1,padding:"14px 0",background:"transparent",border:"none",borderBottom:tab==="history"?`2px solid ${SH.charcoal}`:"2px solid transparent",fontSize:11,fontWeight:700,letterSpacing:"0.12em",textTransform:"uppercase",color:tab==="history"?SH.charcoal:SH.taupe,cursor:"pointer",fontFamily:"inherit",position:"relative"}}>
+                History {history.length>0 && <span style={{background:SH.taupe,color:SH.cream,fontSize:9,padding:"2px 6px",borderRadius:10,marginLeft:4,verticalAlign:"middle"}}>{history.length}</span>}
+              </button>
+            </div>
+
+            {tab === "history" && <div style={s.body}>
+              <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:16}}>
+                <div style={s.secLabel}>Onboarding History</div>
+                {history.length > 0 && <button onClick={clearAllHistory} style={{fontSize:10,padding:"4px 10px",background:"transparent",border:`1px solid ${SH.sand}`,color:SH.taupe,cursor:"pointer",borderRadius:2,letterSpacing:"0.08em",textTransform:"uppercase",fontWeight:600,fontFamily:"inherit"}}>Clear All</button>}
+              </div>
+              {history.length === 0 && <div style={{textAlign:"center",padding:"40px 20px",color:SH.taupe,fontSize:13,fontStyle:"italic"}}>No onboarding submissions yet.<br/>Requests will appear here after you submit.</div>}
+              {history.map(entry => {
+                const statusStyle = {
+                  sent:    {bg:"#e8f5e9", fg:"#2e7d32", label:"SENT"},
+                  sending: {bg:"#fff8e1", fg:"#b26a00", label:"SENDING"},
+                  failed:  {bg:"#fdecea", fg:"#c62828", label:"FAILED"},
+                }[entry.status] || {bg:SH.sand,fg:SH.charcoal,label:(entry.status||"?").toUpperCase()};
+                const when = new Date(entry.submittedAt).toLocaleString();
+                const clickupSearch = `https://app.clickup.com/9014079163/v/l/li/901415197832?search=${encodeURIComponent(entry.name || "")}`;
+                return (
+                  <div key={entry.id} style={{border:`1px solid ${SH.sand}`,borderRadius:2,padding:14,marginBottom:12,background:"#fff"}}>
+                    <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:8,gap:12}}>
+                      <div style={{flex:1,minWidth:0}}>
+                        <div style={{fontWeight:700,fontSize:14}}>{entry.name || "(no name)"}</div>
+                        <div style={{fontSize:11,color:SH.taupe,marginTop:2}}>{entry.role} · {entry.office} · Starts {entry.start}</div>
+                        <div style={{fontSize:10,color:SH.beige,marginTop:4,fontFamily:"'Courier New',monospace"}}>{when} · {entry.attempts||1} attempt{entry.attempts>1?"s":""}</div>
+                      </div>
+                      <div style={{fontSize:9,fontWeight:700,letterSpacing:"0.1em",padding:"3px 8px",borderRadius:2,background:statusStyle.bg,color:statusStyle.fg,whiteSpace:"nowrap"}}>{statusStyle.label}</div>
+                    </div>
+                    {entry.error && <div style={{fontSize:11,color:"#c62828",background:"#fdecea",padding:"6px 10px",borderRadius:2,marginBottom:8,fontFamily:"'Courier New',monospace",wordBreak:"break-word"}}>⚠ {entry.error}</div>}
+                    {entry.responseBody && <div style={{fontSize:11,color:SH.taupe,background:SH.cream,padding:"6px 10px",borderRadius:2,marginBottom:8,fontFamily:"'Courier New',monospace",wordBreak:"break-word"}}>HTTP {entry.responseStatus}: {entry.responseBody || "(empty)"}</div>}
+                    <div style={{display:"flex",gap:6,flexWrap:"wrap"}}>
+                      <button onClick={()=>retryFromHistory(entry)} style={{fontSize:10,padding:"5px 10px",background:SH.charcoal,color:SH.cream,border:"none",cursor:"pointer",borderRadius:2,letterSpacing:"0.06em",textTransform:"uppercase",fontWeight:600,fontFamily:"inherit"}}>Retry</button>
+                      <button onClick={()=>copyPayload(entry)} style={{fontSize:10,padding:"5px 10px",background:"transparent",border:`1px solid ${SH.sand}`,color:SH.taupe,cursor:"pointer",borderRadius:2,letterSpacing:"0.06em",textTransform:"uppercase",fontWeight:600,fontFamily:"inherit"}}>Copy Payload</button>
+                      <a href={clickupSearch} target="_blank" rel="noopener" style={{fontSize:10,padding:"5px 10px",background:"transparent",border:`1px solid ${SH.sand}`,color:SH.taupe,cursor:"pointer",borderRadius:2,letterSpacing:"0.06em",textTransform:"uppercase",fontWeight:600,textDecoration:"none",display:"inline-block"}}>View in ClickUp</a>
+                      <button onClick={()=>deleteHistoryEntry(entry.id)} style={{fontSize:10,padding:"5px 10px",background:"transparent",border:`1px solid ${SH.sand}`,color:"#c62828",cursor:"pointer",borderRadius:2,letterSpacing:"0.06em",textTransform:"uppercase",fontWeight:600,fontFamily:"inherit"}}>Delete</button>
+                    </div>
+                  </div>
+                );
+              })}
+              <div style={{fontSize:10,color:SH.taupe,marginTop:16,padding:"10px 12px",background:SH.cream,borderRadius:2,lineHeight:1.5}}>
+                <b>Note:</b> History is stored in this browser only (localStorage). Clearing browser data will remove it.
+                <br/>"SENT" means Make.com accepted the webhook — verify actual ClickUp folder creation via "View in ClickUp".
+              </div>
+            </div>}
+
+            {tab === "onboard" && <div style={s.body}>
               {phase === "idle" && <>
                 <div style={s.secLabel}>Employee Information</div>
                 <div style={{...s.grid2, marginBottom:12}}>
@@ -359,7 +506,7 @@ Begin immediately. Report each step as you complete it.`.trim();
                 </div>
                 {(phase==="done"||phase==="error")&&<><div style={s.divider}/><button style={s.btn} onClick={reset}>Onboard Another Team Member</button></>}
               </>}
-            </div>
+            </div>}
           </div>
           <div style={{marginTop:20,fontSize:11,color:SH.taupe,letterSpacing:"0.05em",textAlign:"center"}}>
             SMILE HAUS · MODERN FAMILY DENTISTRY & ORTHODONTICS
