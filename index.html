@@ -294,7 +294,6 @@ CRITICAL: Do NOT read template tasks. All task names are listed above. Create th
             responseBody: bodyText.slice(0, 2000),
             completedAt: new Date().toISOString(),
             error: finalStatus === "sent" ? null : `HTTP ${resp.status}: ${bodyText.slice(0,300)}`,
-            folderUrl: parsed?.folder?.url || null,
             parentTaskUrl: parsed?.parentTask?.url || null,
             taskCount: parsed?.taskCount || null,
           }));
@@ -422,7 +421,7 @@ CRITICAL: Do NOT read template tasks. All task names are listed above. Create th
                   failed:  {bg:"#fdecea", fg:"#c62828", label:"FAILED"},
                 }[entry.status] || {bg:SH.sand,fg:SH.charcoal,label:(entry.status||"?").toUpperCase()};
                 const when = new Date(entry.submittedAt).toLocaleString();
-                const clickupSearch = entry.folderUrl || entry.parentTaskUrl || `https://app.clickup.com/9014079163/v/l/li/901415197832?search=${encodeURIComponent(entry.name || "")}`;
+                const clickupSearch = entry.parentTaskUrl || `https://app.clickup.com/9014079163/v/l/li/901415197832?search=${encodeURIComponent(entry.name || "")}`;
                 return (
                   <div key={entry.id} style={{border:`1px solid ${SH.sand}`,borderRadius:2,padding:14,marginBottom:12,background:"#fff"}}>
                     <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:8,gap:12}}>
