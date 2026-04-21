@@ -258,56 +258,84 @@ CRITICAL: Do NOT read template tasks. All task names are listed above. Create th
         setHistory(upsertHistory(baseEntry));
         addLog(`📋 Logged to history (ID: ${subId})`, "info");
 
+        // Helper: chunk an array into groups of N
+        const chunkArr = (arr, size) => {
+          const out = [];
+          for (let i = 0; i < arr.length; i += size) out.push(arr.slice(i, i + size));
+          return out;
+        };
+
+        // Helper: handle Worker re-auth / error parsing
+        const workerError = async (resp, phase) => {
+          const bodyText = await resp.text().catch(()=>"");
+          let parsed = null;
+          try { parsed = JSON.parse(bodyText); } catch {}
+          if (resp.status === 500 && parsed?.error?.includes("Re-authorize")) {
+            addLog("⚠️ Worker lost ClickUp authorization.", "warn");
+            addLog(`   Click here to re-auth: ${WORKER_BASE}/oauth/start`, "warn");
+            return { authFail: true, message: "OAuth re-authorization needed", body: bodyText };
+          }
+          return { authFail: false, message: parsed?.error || `HTTP ${resp.status}: ${bodyText.slice(0,300)}`, body: bodyText, parsed };
+        };
+
         try {
-          addLog("⚙️ Calling Worker to create ClickUp folder + 49 tasks...", "tool");
-          const resp = await fetch(`${WORKER_BASE}/api/onboard`, {
+          // STEP 1: Create parent task + 4 week subtasks
+          addLog("⚙️ [1/3] Creating parent + 4 week subtasks...", "tool");
+          const r1 = await fetch(`${WORKER_BASE}/api/onboard/parent`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(payload),
           });
-          const bodyText = await resp.text().catch(()=>"");
-          let parsed = null;
-          try { parsed = JSON.parse(bodyText); } catch {}
+          if (!r1.ok) {
+            const e = await workerError(r1);
+            throw new Error(e.message);
+          }
+          const parentData = await r1.json();
+          addLog(`✅ Parent created: ${parentData.parentTask.name}`, "success");
+          addLog(`   🧍 ${parentData.parentTask.url}`, "info");
 
-          // 401-ish: Worker needs re-auth
-          if (resp.status === 500 && parsed?.error?.includes("Re-authorize")) {
-            setHistory(upsertHistory({
-              id: subId,
-              status: "failed",
-              responseStatus: resp.status,
-              responseBody: bodyText.slice(0, 1000),
-              completedAt: new Date().toISOString(),
-              error: "Worker needs OAuth re-authorization",
-            }));
-            addLog("⚠️ Worker lost ClickUp authorization.", "warn");
-            addLog(`   Click here to re-auth: ${WORKER_BASE}/oauth/start`, "warn");
-            addLog(`   Takes 10 seconds. Then retry this submission from History.`, "warn");
-            setPhase("error");
-            return;
+          // STEP 2: Create all day tasks in chunks of 22
+          const dayTasks = payload.tasks;
+          const chunks = chunkArr(dayTasks, 22);
+          addLog(`⚙️ [2/3] Creating ${dayTasks.length} day tasks in ${chunks.length} batch${chunks.length>1?"es":""}...`, "tool");
+
+          const allCreated = [];
+          for (let i = 0; i < chunks.length; i++) {
+            addLog(`   📝 Batch ${i+1}/${chunks.length} (${chunks[i].length} tasks)...`, "info");
+            const r2 = await fetch(`${WORKER_BASE}/api/onboard/batch`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                weekIds: parentData.weekIds,
+                employeeName: payload.name,
+                office: payload.office,
+                tasks: chunks[i],
+              }),
+            });
+            if (!r2.ok) {
+              const e = await workerError(r2);
+              throw new Error(`Batch ${i+1} failed: ${e.message}`);
+            }
+            const batchData = await r2.json();
+            allCreated.push(...batchData.created);
           }
 
-          const finalStatus = (resp.ok && parsed?.ok) ? "sent" : "failed";
+          // STEP 3: Success
+          const quizCount = allCreated.filter(t => t.quiz).length;
+          addLog(`✅ [3/3] Done — ${allCreated.length} day tasks created`, "success");
+          if (quizCount) addLog(`   🎓 Quiz links embedded in ${quizCount} quiz task${quizCount>1?"s":""}`, "info");
+
           setHistory(upsertHistory({
             id: subId,
-            status: finalStatus,
-            responseStatus: resp.status,
-            responseBody: bodyText.slice(0, 2000),
+            status: "sent",
             completedAt: new Date().toISOString(),
-            error: finalStatus === "sent" ? null : `HTTP ${resp.status}: ${bodyText.slice(0,300)}`,
-            parentTaskUrl: parsed?.parentTask?.url || null,
-            taskCount: parsed?.taskCount || null,
+            responseStatus: 200,
+            responseBody: JSON.stringify({ parentTask: parentData.parentTask, taskCount: allCreated.length, quizTasks: allCreated.filter(t=>t.quiz) }, null, 2),
+            parentTaskUrl: parentData.parentTask.url,
+            taskCount: allCreated.length,
+            error: null,
           }));
 
-          if (finalStatus !== "sent") {
-            throw new Error(parsed?.error || `Worker returned ${resp.status}: ${bodyText.slice(0, 300)}`);
-          }
-
-          addLog("✅ Folder + 49 tasks created in ClickUp", "success");
-          if (parsed?.folder?.url) addLog(`   📁 Folder: ${parsed.folder.url}`, "info");
-          if (parsed?.parentTask?.url) addLog(`   🧍 Parent task: ${parsed.parentTask.url}`, "info");
-          if (parsed?.quizTasks?.length) {
-            addLog(`   🎓 Quiz links embedded in ${parsed.quizTasks.length} quiz task${parsed.quizTasks.length>1?"s":""}`, "info");
-          }
           addLog("", "divider");
           addLog(`🦷 Onboarding complete for ${form.name}`, "success");
           setPhase("done");
