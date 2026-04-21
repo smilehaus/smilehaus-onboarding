@@ -161,6 +161,9 @@ Day15: "Day 15 — Office Manager Go-Live Clearance & Sign-Off" (1)
 
 CRITICAL: Do NOT read template tasks. All task names are listed above. Create them directly. Be extremely efficient — minimize output text, maximize tool calls. This is for Patient Coordinator role ONLY. For other roles, read tasks from their template folder instead.`;
 
+    // ===== Worker (replaces Make.com) =====
+    const WORKER_BASE = "https://sh-onboarding.smilehaus.workers.dev";
+
     // ===== History persistence (localStorage) =====
     const HISTORY_KEY = "sh_onboarding_history_v1";
     const loadHistory = () => {
@@ -256,34 +259,58 @@ CRITICAL: Do NOT read template tasks. All task names are listed above. Create th
         addLog(`📋 Logged to history (ID: ${subId})`, "info");
 
         try {
-          const resp = await fetch("https://hook.us2.make.com/eupqr1ujk4onc2wyhvrz4ykng411k9f8", {
+          addLog("⚙️ Calling Worker to create ClickUp folder + 49 tasks...", "tool");
+          const resp = await fetch(`${WORKER_BASE}/api/onboard`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(payload),
           });
           const bodyText = await resp.text().catch(()=>"");
-          const finalStatus = resp.ok ? "sent" : "failed";
+          let parsed = null;
+          try { parsed = JSON.parse(bodyText); } catch {}
+
+          // 401-ish: Worker needs re-auth
+          if (resp.status === 500 && parsed?.error?.includes("Re-authorize")) {
+            setHistory(upsertHistory({
+              id: subId,
+              status: "failed",
+              responseStatus: resp.status,
+              responseBody: bodyText.slice(0, 1000),
+              completedAt: new Date().toISOString(),
+              error: "Worker needs OAuth re-authorization",
+            }));
+            addLog("⚠️ Worker lost ClickUp authorization.", "warn");
+            addLog(`   Click here to re-auth: ${WORKER_BASE}/oauth/start`, "warn");
+            addLog(`   Takes 10 seconds. Then retry this submission from History.`, "warn");
+            setPhase("error");
+            return;
+          }
+
+          const finalStatus = (resp.ok && parsed?.ok) ? "sent" : "failed";
           setHistory(upsertHistory({
             id: subId,
             status: finalStatus,
             responseStatus: resp.status,
-            responseBody: bodyText.slice(0, 1000),
+            responseBody: bodyText.slice(0, 2000),
             completedAt: new Date().toISOString(),
-            error: resp.ok ? null : `HTTP ${resp.status}: ${bodyText.slice(0,200)}`,
+            error: finalStatus === "sent" ? null : `HTTP ${resp.status}: ${bodyText.slice(0,300)}`,
+            folderUrl: parsed?.folder?.url || null,
+            parentTaskUrl: parsed?.parentTask?.url || null,
+            taskCount: parsed?.taskCount || null,
           }));
 
-          if (!resp.ok) throw new Error(`Webhook returned ${resp.status}: ${bodyText.slice(0, 200)}`);
+          if (finalStatus !== "sent") {
+            throw new Error(parsed?.error || `Worker returned ${resp.status}: ${bodyText.slice(0, 300)}`);
+          }
 
-          addLog("✅ Onboarding request sent to Make.com", "success");
-          addLog(`   Response: ${bodyText.slice(0,80) || "(empty)"}`, "info");
-          addLog("⚙️ Make.com scenario is now creating folder + 49 tasks...", "tool");
-          addLog("   Check ClickUp in ~30–60 seconds for the folder", "info");
+          addLog("✅ Folder + 49 tasks created in ClickUp", "success");
+          if (parsed?.folder?.url) addLog(`   📁 Folder: ${parsed.folder.url}`, "info");
+          if (parsed?.parentTask?.url) addLog(`   🧍 Parent task: ${parsed.parentTask.url}`, "info");
+          if (parsed?.quizTasks?.length) {
+            addLog(`   🎓 Quiz links embedded in ${parsed.quizTasks.length} quiz task${parsed.quizTasks.length>1?"s":""}`, "info");
+          }
           addLog("", "divider");
-          addLog(`⚠️ NOTE: Make.com has a known filter bug between modules 8→9`, "warn");
-          addLog(`   If quiz tasks don't get quiz URLs, that filter is missing.`, "warn");
-          addLog(`   Add filter in Make.com UI: condition "1.tasks[].quiz" is not empty`, "warn");
-          addLog("", "divider");
-          addLog(`🦷 Onboarding triggered for ${form.name} — see History tab for status`, "success");
+          addLog(`🦷 Onboarding complete for ${form.name}`, "success");
           setPhase("done");
         } catch (err) {
           setHistory(upsertHistory({
@@ -395,7 +422,7 @@ CRITICAL: Do NOT read template tasks. All task names are listed above. Create th
                   failed:  {bg:"#fdecea", fg:"#c62828", label:"FAILED"},
                 }[entry.status] || {bg:SH.sand,fg:SH.charcoal,label:(entry.status||"?").toUpperCase()};
                 const when = new Date(entry.submittedAt).toLocaleString();
-                const clickupSearch = `https://app.clickup.com/9014079163/v/l/li/901415197832?search=${encodeURIComponent(entry.name || "")}`;
+                const clickupSearch = entry.folderUrl || entry.parentTaskUrl || `https://app.clickup.com/9014079163/v/l/li/901415197832?search=${encodeURIComponent(entry.name || "")}`;
                 return (
                   <div key={entry.id} style={{border:`1px solid ${SH.sand}`,borderRadius:2,padding:14,marginBottom:12,background:"#fff"}}>
                     <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:8,gap:12}}>
