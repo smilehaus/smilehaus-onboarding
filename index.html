@@ -149,6 +149,77 @@
       {n:"Day 15 — Week 3 Competency Sign-Off",l:"w3",p:1,d:15},
       {n:"Day 30 — Benchmark Assessment (iTero <4 min, Temps, Invisalign Conversation)",l:"w3",p:1,d:30},
     ];
+
+    // ── Tier-based Dental Assistant tracks (T1–T2 full, T3–T4 gap-training, T5+ test-out) ──
+    // Mirrors the ClickUp template folders. d = training day (Day 30 benchmark d:30). p: 1 urgent, 2 high, 3 normal
+    const DA_WEEKNAMES_A = ["Week 1 — Foundation & Environment","Week 2 — Clinical Procedures","Week 3 — iTero, Invisalign & Advanced Skills"];
+    const DA_WEEKNAMES_B = ["Days 1–2 — Onboarding & Test-Out","Days 3–5 — Smile Haus Protocols","Days 6–8 — Gap Training, Sign-Off & Day 30"];
+    const DA_WEEKNAMES_C = ["Days 1–2 — Onboarding & Test-Out","Days 3–4 — Smile Haus Systems & Standards","Day 5 — Sign-Off & Day 30"];
+    const DA_ONBOARD_B = (maxTier) => [
+      {n:"Day 1 — HR Setup",l:"w1",p:3,d:1},
+      {n:"Day 1 — HIPAA Training & Acknowledgment Sign-Off",l:"w1",p:1,d:1},
+      {n:"Day 1 — Systems Setup: Oryx, ClickUp, Email & All Info Spreadsheet",l:"w1",p:2,d:1},
+      {n:"Day 1 — Culture, Mission, Office Codes & Office Walkthrough",l:"w1",p:3,d:1},
+      {n:"Days 1–2 — Oryx Academy: Modules 2, 3 & 4 (Insurance)",l:"w1",p:2,d:2},
+      {n:`Day 1 — Skills Test-Out: T1–${maxTier} Tier Checklist`,l:"w1",p:1,d:1},
+      {n:"Day 2 — Coronal Polishing Certificate on File",l:"w1",p:2,d:2},
+      {n:"Day 2 — Test-Out Results & Gap List (OM Sign-Off)",l:"w1",p:1,d:2},
+    ];
+    const DA_DAY30 = {n:"Day 30 — Benchmark Assessment",l:"w3",p:1,d:30};
+    const TASKS_DA_B = [
+      ...DA_ONBOARD_B("T4"),
+      {n:"Day 3 — Infection Control & Sterilization (Smile Haus SOPs)",l:"w2",p:1,d:3},
+      {n:"Day 3 — DA Checklist: How to Fill Out Your Office's Lists (Daily)",l:"w2",p:1,d:3},
+      {n:"Day 4 — Operatory Setup & Tray Setups (Smile Haus Standards)",l:"w2",p:2,d:4},
+      {n:"Day 4 — X-Ray Standards & Retakes",l:"w2",p:2,d:4},
+      {n:"Day 5 — Clinical Notes Standards",l:"w2",p:2,d:5},
+      {n:"Day 5 — Competency Sign-Off (Office Manager)",l:"w2",p:1,d:5},
+      {n:"Day 6 — Temporary Crown Protocol (3 Consecutive, Doctor-Initialed)",l:"w3",p:1,d:6},
+      {n:"Day 6 — iTero Setup, Logins & Scanning (<6 min)",l:"w3",p:1,d:6},
+      {n:"Day 7 — Invisalign Scan Conversation & Rx Submission",l:"w3",p:1,d:7},
+      {n:"Day 7 — Lab Case Management & Oryx Lab Tracking",l:"w3",p:2,d:7},
+      {n:"Day 7 — Nitrous & Sedation Protocol",l:"w3",p:3,d:7},
+      {n:"Day 7 — Added Modules: Root Canal, Surgery & Implant Assisting; Inventory",l:"w3",p:2,d:7},
+      {n:"Day 8 — Gap List Close-Out & Competency Sign-Off (OM + Doctor)",l:"w3",p:1,d:8},
+      DA_DAY30,
+    ];
+    const TASKS_DA_C = [
+      ...DA_ONBOARD_B("T5"),
+      {n:"Day 3 — Clinical Team SOP Library for Dental Assistants",l:"w2",p:2,d:3},
+      {n:"Day 3 — DA Checklist: How to Fill Out Your Office's Lists (Daily)",l:"w2",p:1,d:3},
+      {n:"Day 3 — Routing Sheet & Patient Handoff",l:"w2",p:2,d:3},
+      {n:"Day 4 — Lab Case & Inventory Process in Oryx",l:"w2",p:2,d:4},
+      {n:"Day 4 — Doctor Preferences at Your Office",l:"w2",p:2,d:4},
+      {n:"Day 5 — iTero Logins & Speed Check (<4 min)",l:"w3",p:1,d:5},
+      {n:"Day 5 — Invisalign Scan Conversation & Approved Language",l:"w3",p:1,d:5},
+      {n:"Day 5 — Temporary Crowns (3 Consecutive, Doctor-Initialed)",l:"w3",p:1,d:5},
+      {n:"Day 5 — Lead Role: Cross-Training Newer Team Members",l:"w3",p:3,d:5},
+      {n:"Day 5 — Gap List Close-Out & Competency Sign-Off (OM + Doctor)",l:"w3",p:1,d:5},
+      DA_DAY30,
+    ];
+    // Starting tier options per role (set at the working interview, recorded by the Office Manager)
+    const TIERS_BY_ROLE = {
+      "Dental Assistant": [
+        ["T1","T1 — Entry (Just Graduated) · $17/hr"],["T2","T2 — Entry-Level Solo Assist · $18–19/hr"],
+        ["T3","T3 — Crown & Bridge Proficient · $20–21/hr"],["T4","T4 — Multi-Temps, Surgery & Tx · $22–24/hr"],
+        ["T5","T5 — Back-Office Lead (2+ yrs) · $25–26/hr"],["T6","T6 — Cross-Trained FD & Trainer · $27–29/hr"],
+        ["T7","T7 — Complex Tx, OM Coverage · $30+/hr"],
+      ],
+      "Patient Coordinator": [
+        ["T1","T1 — Entry (Just Hired) · $18/hr"],["T2","T2 — Front Desk Foundations · $19–20/hr"],
+        ["T3","T3 — Insurance & Billing Proficient · $21–22/hr"],["T4","T4 — Case Acceptance & Financial Coordination · $23–24/hr"],
+        ["T5","T5 — Lead Patient Coordinator · $25–26/hr"],["T6","T6 — Senior Coordinator / OM Support · $27–29/hr"],
+        ["T7","T7 — Complex Case Mgmt & OM Coverage · $30–32/hr"],
+      ],
+    };
+    // DA tier -> training track: A = T1–T2 (full 3 weeks), B = T3–T4 (~8 days), C = T5+ (~5 days)
+    const daTrack = (tier) => (tier === "T1" || tier === "T2") ? "A" : (tier === "T3" || tier === "T4") ? "B" : "C";
+    const DA_TRACKS = {
+      A: { tasks: TASKS_DA,   weekNames: DA_WEEKNAMES_A },
+      B: { tasks: TASKS_DA_B, weekNames: DA_WEEKNAMES_B },
+      C: { tasks: TASKS_DA_C, weekNames: DA_WEEKNAMES_C },
+    };
+
     function calcDueDates(startStr, schedule) {
       const dayNames = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
       const workDayNums = new Set();
@@ -228,7 +299,7 @@ CRITICAL: Do NOT read template tasks. All task names are listed above. Create th
 
     function App() {
       const [tab, setTab] = useState("onboard"); // onboard | history
-      const [form, setForm] = useState({ name: "", office: "", role: "", start: "", traineeEmail: "", trainerEmail: "", schedule: { Mon:"", Tue:"", Wed:"", Thu:"", Fri:"", Sat:"", Sun:"" } });
+      const [form, setForm] = useState({ name: "", office: "", role: "", tier: "", start: "", traineeEmail: "", trainerEmail: "", schedule: { Mon:"", Tue:"", Wed:"", Thu:"", Fri:"", Sat:"", Sun:"" } });
       const [phase, setPhase] = useState("idle");
       const [log, setLog] = useState([]);
       const [history, setHistory] = useState(loadHistory());
@@ -245,6 +316,8 @@ CRITICAL: Do NOT read template tasks. All task names are listed above. Create th
             else newSched[d] = "";
           });
           setForm(f => ({ ...f, office: v, schedule: newSched }));
+        } else if (k === "role") {
+          setForm(f => ({ ...f, role: v, tier: "" })); // tier options depend on role
         } else {
           setForm(f => ({ ...f, [k]: v }));
         }
@@ -257,7 +330,8 @@ CRITICAL: Do NOT read template tasks. All task names are listed above. Create th
       }, [log]);
 
       const workDays = Object.values(form.schedule).filter(v => v !== "");
-      const canRun = form.name && form.office && form.role && form.start && workDays.length > 0;
+      const needsTier = !!TIERS_BY_ROLE[form.role];
+      const canRun = form.name && form.office && form.role && (!needsTier || form.tier) && form.start && workDays.length > 0;
 
       async function runOnboarding(existingId) {
         setPhase("running");
@@ -274,13 +348,16 @@ CRITICAL: Do NOT read template tasks. All task names are listed above. Create th
           name: form.name,
           office: form.office,
           role: form.role,
+          tier: form.tier || null,
+          track: form.role === "Dental Assistant" ? daTrack(form.tier) : null,
           start: form.start,
           traineeEmail: form.traineeEmail,
           trainerEmail: form.trainerEmail,
           homeOfficeId: OFFICE_TO_CLICKUP_ID[form.office] || "",
           weeks: form.role === "Dental Assistant" ? 3 : 4,
+          weekNames: form.role === "Dental Assistant" ? DA_TRACKS[daTrack(form.tier)].weekNames : null,
           manualUrl: form.role === "Dental Assistant" ? DA_MANUAL : null,
-          tasks: (form.role === "Dental Assistant" ? TASKS_DA : TASKS_PC).map(t => ({...t, due: calcDueDates(form.start, form.schedule)[t.d] || null})),
+          tasks: (form.role === "Dental Assistant" ? DA_TRACKS[daTrack(form.tier)].tasks : TASKS_PC).map(t => ({...t, due: calcDueDates(form.start, form.schedule)[t.d] || null})),
         };
 
         // Record attempt in history BEFORE fetch
@@ -289,6 +366,7 @@ CRITICAL: Do NOT read template tasks. All task names are listed above. Create th
           name: form.name,
           office: form.office,
           role: form.role,
+          tier: form.tier || null,
           start: form.start,
           traineeEmail: form.traineeEmail,
           trainerEmail: form.trainerEmail,
@@ -402,6 +480,7 @@ CRITICAL: Do NOT read template tasks. All task names are listed above. Create th
           name: entry.name || "",
           office: entry.office || "",
           role: entry.role || "",
+          tier: entry.tier || "",
           start: entry.start || "",
           traineeEmail: entry.traineeEmail || "",
           trainerEmail: entry.trainerEmail || "",
@@ -437,7 +516,7 @@ CRITICAL: Do NOT read template tasks. All task names are listed above. Create th
       function reset() {
         setPhase("idle");
         setLog([]);
-        setForm({ name:"", office:"", role:"", start:"", traineeEmail:"", trainerEmail:"", schedule:{ Mon:"", Tue:"", Wed:"", Thu:"", Fri:"", Sat:"", Sun:"" } });
+        setForm({ name:"", office:"", role:"", tier:"", start:"", traineeEmail:"", trainerEmail:"", schedule:{ Mon:"", Tue:"", Wed:"", Thu:"", Fri:"", Sat:"", Sun:"" } });
       }
 
       const logColor = (type) => ({
@@ -547,6 +626,22 @@ CRITICAL: Do NOT read template tasks. All task names are listed above. Create th
                     </select>
                   </div>
                 </div>
+                {TIERS_BY_ROLE[form.role] && (
+                  <div style={s.grid1}>
+                    <div style={s.field}>
+                      <label style={s.label}>Starting Tier * (from the working interview)</label>
+                      <select style={s.select} value={form.tier} onChange={e=>set("tier",e.target.value)}>
+                        <option value="">Select starting tier</option>
+                        {TIERS_BY_ROLE[form.role].map(([v,l])=><option key={v} value={v}>{l}</option>)}
+                      </select>
+                      {form.role === "Dental Assistant" && form.tier && (
+                        <div style={{fontSize:10,color:SH.taupe,marginTop:6}}>
+                          {daTrack(form.tier)==="A" ? "Full 3-week program + Day 30 benchmark" : daTrack(form.tier)==="B" ? "About 8 days: test-out, train gaps only, + Day 30 benchmark" : "About 5 days: test-out, Smile Haus systems, + Day 30 benchmark"}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
                 <div style={{marginTop:12}}>
                   <div style={s.field}>
                     <label style={s.label}>Start Date *</label>
