@@ -106,6 +106,49 @@
       {n:"Day 19 — Final Competency Sign-Off (Treatment Plans, Insurance Knowledge, Checkout Processes, Scrambling Eggs)",l:"w4",p:1,d:19},
       {n:"Day 20 — Office Manager Go-Live Clearance & Sign-Off",l:"w4",p:1,d:20},
     ];
+    const DA_MANUAL = "https://app.clickup.com/9014079163/docs/8cmfvnv-65734";
+    // Dental Assistant: 3 weeks (w1-w3), Day 30 benchmark lives in w3. p: 1 urgent, 2 high, 3 normal
+    const TASKS_DA = [
+      {n:"Day 1 — HR Setup",l:"w1",p:2,d:1},
+      {n:"Day 1 — HIPAA Training & Acknowledgment Sign-Off",l:"w1",p:1,d:1},
+      {n:"Day 1 — Systems Setup: Oryx, ClickUp, Email & All Info Spreadsheet",l:"w1",p:1,d:1},
+      {n:"Day 1 — Oryx Academy: Module 2",l:"w1",p:1,d:1},
+      {n:"Day 1 — Culture, Mission & Office Codes",l:"w1",p:2,d:1},
+      {n:"Day 1 — Patient Experience Standards: Caring for the Patient",l:"w1",p:2,d:1},
+      {n:"Day 2 — Teeth Nomenclature (90%+ Quiz)",l:"w1",p:2,d:2},
+      {n:"Day 2 — Instrument Guide & Bur Blocks",l:"w1",p:2,d:2},
+      {n:"Days 2–3 — Oryx Academy: Module 3",l:"w1",p:2,d:3},
+      {n:"Day 3 — Infection Control",l:"w1",p:1,d:3},
+      {n:"Day 3 — Sterilization, Autoclave & Operatory Turnover",l:"w1",p:1,d:3},
+      {n:"Day 4 — Operatory/Room Setup & Restocking",l:"w1",p:2,d:4},
+      {n:"Day 4 — Tray Setups: Basic, Exam & Restorative",l:"w1",p:1,d:4},
+      {n:"Days 4–5 — Oryx Academy: Module 4 (Insurance)",l:"w1",p:2,d:5},
+      {n:"Day 5 — Dental X-Rays",l:"w1",p:1,d:5},
+      {n:"Day 5 — Week 1 Competency Sign-Off",l:"w1",p:1,d:5},
+      {n:"Day 6 — Morning Set-Up Protocol",l:"w2",p:1,d:6},
+      {n:"Day 6 — Exam Flow: New Patient, Periodic & Emergency",l:"w2",p:2,d:6},
+      {n:"Day 7 — Restorative (Fillings): Full DA Procedure",l:"w2",p:1,d:7},
+      {n:"Day 8 — Crown & Bridge Prep: Impression, Cord & Scan Sequence",l:"w2",p:1,d:8},
+      {n:"Day 8 — Temporary Crowns: 3 Consecutive, Doctor Sign-Off",l:"w2",p:1,d:8},
+      {n:"Day 9 — Crown Seat",l:"w2",p:2,d:9},
+      {n:"Day 9 — Extraction",l:"w2",p:2,d:9},
+      {n:"Day 10 — Writing Clinical Notes",l:"w2",p:2,d:10},
+      {n:"Day 10 — Full Appointment Simulation (Filling + Crown Prep)",l:"w2",p:1,d:10},
+      {n:"Day 10 — Week 2 Competency Sign-Off (Clinical Procedures)",l:"w2",p:1,d:10},
+      {n:"Day 11 — iTero Setup, Logins & Crown Scanning",l:"w3",p:1,d:11},
+      {n:"Day 11 — iTero Speed Training: Timed Crown Scans (<6 min now, <4 min by Day 30)",l:"w3",p:1,d:11},
+      {n:"Day 12 — Invisalign Scan Workflow & Outcome Simulator",l:"w3",p:1,d:12},
+      {n:"Day 12 — Talking About the Invisalign Scan (Patient Conversation)",l:"w3",p:1,d:12},
+      {n:"Day 12 — Invisalign Patient Account & Rx Submission",l:"w3",p:2,d:12},
+      {n:"Day 13 — Invisalign Appointment Flow (All Stages)",l:"w3",p:2,d:13},
+      {n:"Day 13 — Lab Case Management & Oryx Lab Tracking",l:"w3",p:2,d:13},
+      {n:"Day 14 — Nitrous Oxide",l:"w3",p:3,d:14},
+      {n:"Day 14 — Sealants, Whitening & Pediatrics",l:"w3",p:3,d:14},
+      {n:"Day 15 — Speed Drills: iTero, Temporary Crown & Tray Setup",l:"w3",p:1,d:15},
+      {n:"Day 15 — Final Role-Play: Invisalign Scan Conversation",l:"w3",p:1,d:15},
+      {n:"Day 15 — Week 3 Competency Sign-Off",l:"w3",p:1,d:15},
+      {n:"Day 30 — Benchmark Assessment (iTero <4 min, Temps, Invisalign Conversation)",l:"w3",p:1,d:30},
+    ];
     function calcDueDates(startStr, schedule) {
       const dayNames = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
       const workDayNums = new Set();
@@ -235,7 +278,9 @@ CRITICAL: Do NOT read template tasks. All task names are listed above. Create th
           traineeEmail: form.traineeEmail,
           trainerEmail: form.trainerEmail,
           homeOfficeId: OFFICE_TO_CLICKUP_ID[form.office] || "",
-          tasks: TASKS_PC.map(t => ({...t, due: calcDueDates(form.start, form.schedule)[t.d] || null})),
+          weeks: form.role === "Dental Assistant" ? 3 : 4,
+          manualUrl: form.role === "Dental Assistant" ? DA_MANUAL : null,
+          tasks: (form.role === "Dental Assistant" ? TASKS_DA : TASKS_PC).map(t => ({...t, due: calcDueDates(form.start, form.schedule)[t.d] || null})),
         };
 
         // Record attempt in history BEFORE fetch
